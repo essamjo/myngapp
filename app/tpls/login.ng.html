@@ -6,12 +6,12 @@
 			</div>
 			<div class="login-content ">
 			<div class="form" ng-controller="loginController">
-				<form  novalidate name="loginform">
+				<form  novalidate name="loginform" ng-submit="processForm()">
 					<div class="form-group">
 						<div class="col-xs-12  ">
 							<div class="input-group">
 								<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-								<input type="text" id="username" name="username" class="form-control" required ng-model="loginController.username" placeholder="用户名">
+								<input type="text" id="username" name="username" class="form-control" required ng-model="user.username" placeholder="手机号码">
 							</div>
 						</div>
 					</div>
@@ -19,13 +19,13 @@
 						<div class="col-xs-12 ">
 							<div class="input-group">
 								<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-								<input type="password" id="password" name="password" class="form-control" ng-minlength={{6}} required ng-model="loginController.password"  placeholder="密码">
+								<input type="password" id="password" name="password" class="form-control" ng-minlength={{6}} required ng-model="user.password"  placeholder="密码">
 							</div>
 						</div>
 					</div>
 					<div class="form-group form-actions">
 						<div class="col-xs-4 col-xs-offset-4 ">
-							<button type="submit" class="btn btn-sm btn-info" ng-click="processForm"><span class="glyphicon glyphicon-off"></span> 登录</button>
+							<button type="submit" class="btn btn-sm btn-info" ng-disabled="loginform.$invalid"><span class="glyphicon glyphicon-off"></span> 登录</button>
 						</div>
 					</div><!-- 
 					<div class="form-group">
