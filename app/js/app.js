@@ -54,59 +54,57 @@ var jhSys=angular.module('jhSys',['ui.router'],function($httpProvider){
 });
 
 
-jhSys.factory('UserInterceptor', ["$q","$rootScope",function ($q,$rootScope) {
-    return {
-        request:function(config){
-            config.headers["TOKEN"] = $rootScope.user.token;
-            return config;
-        },
-        responseError: function (response) {
-            var data = response.data;
-            // 判断错误码，如果是未登录
-            if(data["errorCode"] == "500999"){
-                // 清空用户本地token存储的信息，如果
-                $rootScope.user = {token:""};
-                // 全局事件，方便其他view获取该事件，并给以相应的提示或处理
-                $rootScope.$emit("userIntercepted","notLogin",response);
-            }
-            // 如果是登录超时
-            if(data["errorCode"] == "500998"){
-                $rootScope.$emit("userIntercepted","sessionOut",response);
-            }
-            return $q.reject(response);
+
+jhSys.config(function($stateProvider,$urlRouterProvider,$httpProvider,USER_ROLES){
+    $httpProvider.interceptors.push([
+        '$injector',
+        function ($injector) {
+          return $injector.get('AuthInterceptor');
         }
-    };
-}]);
-
-
-jhSys.config(function($stateProvider,$urlRouterProvider,$httpProvider){
-    $httpProvider.interceptors.push('UserInterceptor');
+    ]);
     $urlRouterProvider.otherwise('/login');
 
     $stateProvider
     .state('login',{
         url:'/login',
-        templateUrl:'/tpls/login.ng.html'
+        templateUrl:'/tpls/login.ng.html',
+        data: {
+           authorizedRoles: []
+        }
     })
     .state('dashboard',{
         url:'/dashboard',
-        templateUrl:'/tpls/dashboard.ng.html'
+        templateUrl:'/tpls/dashboard.ng.html',
+        data: {
+          authorizedRoles: [USER_ROLES.admin, USER_ROLES.editor]
+        },
+        resolve: {
+            auth: function resolveAuthentication(AuthResolver) { 
+              return AuthResolver.resolve();
+            }
+        }
     })
     .state('sample',{
         url:'/sample',
-        templateUrl:'/tpls/sample.html'
+        templateUrl:'/tpls/sample.html',
+        data: {
+          authorizedRoles: [USER_ROLES.admin, USER_ROLES.editor]
+        }
     })
 });
 
-
-jhSys.run(['$rootScope', function($rootScope,$state){
-    $rootScope.user={};
-    $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
-        if(toState.name=='login')return;// 如果是进入登录界面则允许
-        // 如果用户不存在
-        if(!$rootScope.user || !$rootScope.user.token){
-            event.preventDefault();// 取消默认跳转行为
-            $state.go("login",{from:fromState.name,w:'notLogin'});//跳转到登录界面
-        }
-    });
-}])
+jhSys.run(function ($rootScope, AUTH_EVENTS, AuthService) {
+  $rootScope.$on('$stateChangeStart', function (event, next) {    
+    var authorizedRoles = next.data.authorizedRoles;
+    if (!AuthService.isAuthorized(authorizedRoles)&& authorizedRoles != 0) {
+      event.preventDefault();
+      if (AuthService.isAuthenticated()) {
+        // user is not allowed
+        $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
+      } else {
+        // user is not logged in
+        $rootScope.$broadcast(AUTH_EVENTS.notAuthenticated);
+      }
+    }
+  });
+})
