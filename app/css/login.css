@@ -39,7 +39,11 @@ html,body {
         margin-left: -250px;
     }
 }   
-
+@media(min-width:768px) {
+    body {
+        margin-top: 0;
+    }
+}
 .form {
     width: 100%;
     max-width:500px;

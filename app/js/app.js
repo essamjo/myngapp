@@ -72,25 +72,41 @@ jhSys.config(function($stateProvider,$urlRouterProvider,$httpProvider,USER_ROLES
            authorizedRoles: []
         }
     })
-    .state('dashboard',{
-        url:'/dashboard',
-        templateUrl:'/tpls/dashboard.ng.html',
-        data: {
-          authorizedRoles: [USER_ROLES.admin, USER_ROLES.editor]
-        },
-        resolve: {
-            auth: function resolveAuthentication(AuthResolver) { 
-              return AuthResolver.resolve();
-            }
-        }
-    })
-    .state('sample',{
-        url:'/sample',
-        templateUrl:'/tpls/sample.html',
+    .state('app',{
+        url:'/app',
+        templateUrl:'/tpls/app.html',
         data: {
           authorizedRoles: [USER_ROLES.admin, USER_ROLES.editor]
         }
+        // ,
+        // resolve: { //预载入
+        //     auth: function resolveAuthentication(AuthResolver) { 
+        //       return AuthResolver.resolve();
+        //     }
+        // }
     })
+    .state('app.overview',{
+        url:'/overview',
+        templateUrl:'/tpls/pages/overview.html',
+        data: {
+          authorizedRoles: [USER_ROLES.admin, USER_ROLES.editor]
+        }
+    })
+    .state('app.activitieslist',{
+        url:'/activitieslist',
+        templateUrl:'/tpls/pages/activitiesList.html',
+        data: {
+          authorizedRoles: [USER_ROLES.admin, USER_ROLES.editor]
+        }
+    })
+    .state('app.addactivity',{
+        url:'/addactivity',
+        templateUrl:'/tpls/pages/addActivity.html',
+        data: {
+          authorizedRoles: [USER_ROLES.admin, USER_ROLES.editor]
+        }
+    })
+
 });
 
 jhSys.run(function ($rootScope, AUTH_EVENTS, AuthService) {

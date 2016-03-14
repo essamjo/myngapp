@@ -24,8 +24,8 @@ jhSys.controller('loginController', function ($scope, $rootScope, $state, AUTH_E
     AuthService.login(credentials).then(function (user) {
       $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
       $scope.setCurrentUser(user);  
-       $state.go('dashboard') 
-  console.log( $state)
+      $state.go('app.overview') 
+      //console.log( $state)
       
     }, function () {
       $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
